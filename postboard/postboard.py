@@ -1,6 +1,6 @@
 """Postboard using webpy"""
 
-import web
+import web, model
 
 #Url mappings
 
@@ -21,13 +21,6 @@ render = web.template.render('templates/')
 
 class Index:
 
-	def GET(self, name=None):
-		"""Show Page"""	
-		return render.index(name)
-
-
-class Post:
-
 	form = web.form.Form(
 		web.form.Textbox('title', web.form.notnull, 
 			size=30,
@@ -35,13 +28,15 @@ class Post:
 		web.form.Textarea('content', web.form.notnull, 
 			rows=10, cols=60,
 			description="Post content:"),
-		web.form.Button('Post entry'),
+		web.form.Button("Submit"),
 	)
 
-	def GET(self):
-		"""form"""
+	def GET(self, name=None):
+		"""Show Page"""	
+		post = model.get_post()
 		form = self.form()
-		return render.post(form)
+		form.fill()
+		return render.index(form)
 
 	def POST(self):
 		form = self.form()
@@ -50,10 +45,8 @@ class Post:
 		raise web.seeother('/')
 
 
-
 app = web.application(urls, globals())
 
 
 if __name__ == "__main__":
-	
 	app.run()
